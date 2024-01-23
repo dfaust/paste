@@ -180,6 +180,12 @@ pub(crate) fn paste(segments: &[Segment]) -> Result<String> {
                     "upper" => {
                         evaluated.push(last.to_uppercase());
                     }
+                    #[cfg(feature = "convert_case")]
+                    "snake" => {
+                        use convert_case::{Case, Casing};
+                        evaluated.push(last.to_case(Case::Snake));
+                    }
+                    #[cfg(not(feature = "convert_case"))]
                     "snake" => {
                         let mut acc = String::new();
                         let mut prev = '_';
@@ -192,6 +198,12 @@ pub(crate) fn paste(segments: &[Segment]) -> Result<String> {
                         }
                         evaluated.push(acc.to_lowercase());
                     }
+                    #[cfg(feature = "convert_case")]
+                    "camel" => {
+                        use convert_case::{Case, Casing};
+                        evaluated.push(last.to_case(Case::Pascal));
+                    }
+                    #[cfg(not(feature = "convert_case"))]
                     "camel" => {
                         let mut acc = String::new();
                         let mut prev = '_';
@@ -212,6 +224,16 @@ pub(crate) fn paste(segments: &[Segment]) -> Result<String> {
                             prev = ch;
                         }
                         evaluated.push(acc);
+                    }
+                    #[cfg(feature = "convert_case")]
+                    "lowerCamel" => {
+                        use convert_case::{Case, Casing};
+                        evaluated.push(last.to_case(Case::Camel));
+                    }
+                    #[cfg(feature = "convert_case")]
+                    "kebab" => {
+                        use convert_case::{Case, Casing};
+                        evaluated.push(last.to_case(Case::Kebab));
                     }
                     _ => {
                         return Err(Error::new2(
